@@ -15,7 +15,7 @@ from snowflake.connector.pandas_tools import write_pandas
 from dotenv import load_dotenv
 
 # config values 
-limit = 100
+limit = 100000
 
 def index_crawler(project_url):
 
@@ -25,8 +25,13 @@ def index_crawler(project_url):
     container_block = soup.find(class_="main-container")
 
     project_detail_name = container_block.find('h1', class_='page-title').text.strip()
-    project_detail_features = container_block.find('ul', class_='features').find_all('li')
-    project_detail_features_list = [ feature.text.strip() for feature in project_detail_features ]
+
+    if container_block.find('ul', class_='features'):
+        project_detail_features = container_block.find('ul', class_='features').find_all('li')
+        project_detail_features_list = [ feature.text.strip() for feature in project_detail_features ]
+    else:
+        project_detail_features = ''
+        project_detail_features_list = []
 
     project_detail_meta = container_block.find('ul', class_='project-li-top')
 
@@ -84,7 +89,7 @@ def index_list():
     database = os.environ.get("snowflake_database")
     schema = os.environ.get("snowflake_schema")
 
-    query = "select * from DBT_PROJECT03.STG__PROJECTS_LIST"
+    query = "select * from RAW.JSON__INDEX_META"
     connector = snowflake.connector.connect(
         host=host,
         user=user,
@@ -99,7 +104,7 @@ def index_list():
         connector.close()
     df = cursor.fetch_pandas_all()
 
-    return df['URL'].to_list()
+    return df['PROJECT_URL'].to_list()
 
 def details_list():
 
@@ -111,7 +116,7 @@ def details_list():
     database = os.environ.get("snowflake_database")
     schema = os.environ.get("snowflake_schema")
 
-    query = "select * from DBT_PROJECT03.STG__DETAILS_LIST"
+    query = "select * from RAW.JSON__DETAILS"
     connector = snowflake.connector.connect(
         host=host,
         user=user,
@@ -126,7 +131,7 @@ def details_list():
         connector.close()
     df = cursor.fetch_pandas_all()
 
-    return df['URL'].to_list()
+    return df['PROJECT_URL'].to_list()
 
 if __name__ == '__main__':
     # Read arguments and configurations and initialize
@@ -164,11 +169,12 @@ if __name__ == '__main__':
     crawled_project_url = index_list()
     extracted_project_url = details_list()
 
-    target_url = [ i for i in crawled_project_url if  i not in extracted_project_url ]
+    target_url = [ i for i in crawled_project_url if i not in extracted_project_url ]
 
     for i, project_url in enumerate(target_url):
         details = index_crawler(project_url)
 
+        print(details)
         producer.produce(topic, key=None, value=details, on_delivery=acked)
         producer.poll(0)
 

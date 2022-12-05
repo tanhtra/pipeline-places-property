@@ -132,3 +132,4 @@ dmypy.json
 *.sh
 kafka.config
 data/
+prototype/

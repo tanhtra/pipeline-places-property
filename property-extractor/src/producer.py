@@ -24,7 +24,7 @@ def index_crawler(URL):
     page = requests.get(URL, headers={'User-Agent': 'Mozilla/5.0'})
 
     soup = BeautifulSoup(page.content, "html.parser")
-    result_block = soup.find(id="search-results")
+    result_block = soup.find(id="search-results") ## Needs a Try block
 
     if result_block.find_all('article','projects-list'):
         projects = result_block.find_all('article','projects-list')
@@ -41,6 +41,7 @@ def index_crawler(URL):
         project_sale = project_vacancy[0].text.strip().split()[0]
 
         if project_url in crawled_project_url:
+            print(f'Skipping {project_url} - already crawled')
             continue
 
         if None not in (project_name, project_url):
@@ -51,7 +52,7 @@ def index_crawler(URL):
                 'project_sale' : project_sale
             } 
             jd = json.dumps(project_index)
-            time.sleep(1)
+            time.sleep(2)
             yield jd
     return
 
@@ -66,7 +67,7 @@ def index_list():
     database = os.environ.get("snowflake_database")
     schema = os.environ.get("snowflake_schema")
 
-    query = "select * from DBT_PROJECT03.STG__PROJECTS_LIST"
+    query = "select * from RAW.JSON__INDEX_META"
     connector = snowflake.connector.connect(
         host=host,
         user=user,
@@ -81,7 +82,7 @@ def index_list():
         connector.close()
     df = cursor.fetch_pandas_all()
 
-    return df['URL'].to_list()
+    return df['PROJECT_URL'].to_list()
 
 if __name__ == '__main__':
     # Read arguments and configurations and initialize
@@ -136,6 +137,7 @@ if __name__ == '__main__':
 
     for i in range(1,project_page):
         for jd in index_crawler(f"{URL}?page={i}"):
+                print(jd)
                 producer.produce(topic, key=None, value=jd, on_delivery=acked)
                 producer.poll(0)
     
