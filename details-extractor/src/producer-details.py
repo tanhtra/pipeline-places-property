@@ -53,12 +53,12 @@ def index_crawler(project_url):
     project_map = container_block.find('a', id='go-to-map').find('img')['src']
 
     if container_block.find('a', id='open-tab-sale'):
-        project_vacancy_sale = container_block.find('a', id='open-tab-sale').text
+        project_vacancy_sale = container_block.find('a', id='open-tab-sale').text.split()[0]
     else:
         project_vacancy_sale = '0'
 
     if container_block.find('a', id='open-tab-rent'):
-        project_vacancy_rent = container_block.find('a', id='open-tab-rent').text
+        project_vacancy_rent = container_block.find('a', id='open-tab-rent').text.split()[0]
     else:
         project_vacancy_rent = '0'
 
@@ -169,9 +169,9 @@ if __name__ == '__main__':
     crawled_project_url = index_list()
     extracted_project_url = details_list()
 
-    target_url = [ i for i in crawled_project_url if i not in extracted_project_url ]
+    target_urls = [ i for i in crawled_project_url if i not in extracted_project_url ]
 
-    for i, project_url in enumerate(target_url):
+    for i, project_url in enumerate(crawled_project_url):
         details = index_crawler(project_url)
 
         print(details)
