@@ -133,3 +133,4 @@ dmypy.json
 kafka.config
 data/
 prototype/
+.streamlit/
