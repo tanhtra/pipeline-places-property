@@ -31,4 +31,4 @@ jobs:
         with:
           python-version: "3.9"
       - name: Run dbt Cloud job
-        run: "python python/run_and_monitor_dbt_job.py"
+        run: "python dbt/python/run_and_monitor_dbt_job.py"
