@@ -1,0 +1,25 @@
+version: 2
+
+models:
+    - name: stg__transit
+      description: "Transit Station data"
+      columns:
+          - name: Code
+            description: "The primary key for this table"
+            tests:
+                - unique
+                - not_null
+          - name: Name
+            tests:
+                - not_null
+          - name: Lat
+            description: "Lattitude value"
+            tests:
+                - not_null
+          - name: Long
+            description: "Longitude value"
+            tests:
+                - not_null
+          - name: Coord
+            tests:
+                - not_null

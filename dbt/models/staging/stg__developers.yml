@@ -1,0 +1,15 @@
+version: 2
+
+models:
+    - name: stg__developers
+      description: "Developers data"
+      columns:
+          - name: developer_key
+            description: "The primary key for this table"
+            tests:
+                - unique
+                - not_null
+          - name: developer_name
+            tests:
+                - unique
+                - not_null

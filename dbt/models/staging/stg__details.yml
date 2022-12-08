@@ -1,0 +1,18 @@
+version: 2
+
+models:
+  - name: stg__details
+    description: "List of project details"
+    columns:
+      - name: project_key
+        description: 'Primary key for project'
+        tests:
+          - not_null
+          - unique
+      - name: developer_key
+        description: 'Key for developer '
+      - name: floor
+        description: 'Number of floors in the project'
+      - name: Features
+      - name: Year
+      - name: Map
