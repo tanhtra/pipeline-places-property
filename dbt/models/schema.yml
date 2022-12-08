@@ -1,0 +1,9 @@
+version: 2
+
+sources:
+  - name: raw
+    tables:
+      - name: csv__transit_data
+      - name: csv__places_data_scd
+      - name: json__index_meta
+      - name: json__details
