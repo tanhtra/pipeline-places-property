@@ -130,7 +130,6 @@ dmypy.json
 
 # Secret setters
 *.sh
-kafka.config
 data/
 prototype/
 .streamlit/
