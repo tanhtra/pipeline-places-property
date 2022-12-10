@@ -1,5 +1,7 @@
 # Property Crawler Pipeline
 
+## Overview
+
 The PCP (Property Crawler Pipeline) is a combination concepts that forms an almost end to end data extraction pipeline using (but not limited to)
 
 - Beautiful Soup 4 as the crawler engine
@@ -11,14 +13,27 @@ The PCP (Property Crawler Pipeline) is a combination concepts that forms an almo
 - AWS (S3) as the file / export repository
 - and Streamlit as dashboard
 
+The project combines various sources of data such as:
 
-# Getting started
+- Places API data from FourSquare
+- Bangkok Transit Station data
+- Data from a certain Thailand-based property site
+
+The codebase have been split up into several components:
+
+- dbt, the dbt files needed to run the raw, staging and serving transformations
+- places-extractor, the script used to query the FourSquare Developer APIs with (currently) the transit coordinates
+- property-extractor, the script used to scrape the list of viable data to be used by the details-extractor
+- details-extractor, the main page crawler script that extracts data and acts as the primary producer for Confluent
+- streamlit - the data visualisation and simple exploration arm of the project
+
+# Get started
 
 ## Transformation tools
 
 ### dbt
 
-- Sign up to dbt cloud
+- Sign up to [dbt cloud](https://www.getdbt.com/)
 - Initialise dbt cloud using the dbt_project.yml
 
 ### AWS S3
