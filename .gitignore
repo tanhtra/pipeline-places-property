@@ -133,3 +133,7 @@ dmypy.json
 data/
 prototype/
 .streamlit/
+logs/
+dbt_packages/
+
+.DS_store
