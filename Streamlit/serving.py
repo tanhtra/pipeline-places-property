@@ -41,8 +41,9 @@ def snowflake_query(snowflake_schema, snowflake_table, cd):
         account=cd['account'],
         warehouse=cd['warehouse'],
         database=cd['database'],
-        schema=cd['schema'])
-
+        schema=cd['schema'],
+        client_session_keep_alive=True)
+        
     try:
         cursor = connector.cursor().execute(query)
     finally:
