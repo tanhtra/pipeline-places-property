@@ -14,7 +14,6 @@ list as (
 ),
 merged as (
     select 
-        l.project_key,
         l.name,
         v.index_rent,
         v.index_sale,

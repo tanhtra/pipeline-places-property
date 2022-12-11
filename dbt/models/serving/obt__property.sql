@@ -16,11 +16,16 @@ developers as (
     select *
     from {{ ref('stg__developers') }}
 ),
+vacancy as (
+    select *
+    from {{ ref('stg__vacancy') }}
+),
 merged as (
     select 
-        l.project_key,
         l.name,
         l.url,
+        v.detail_rent,
+        v.detail_sale,
         d.floors,
         d.features,
         d.year,
@@ -30,6 +35,7 @@ merged as (
         list l
         left join details d on l.project_key = d.project_key
         left join developers dev on d.developer_key = dev.developer_key
+        left join vacancy v on l.project_key = v.project_key
 )
 
 select * 

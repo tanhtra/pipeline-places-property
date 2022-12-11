@@ -16,7 +16,7 @@ developers as (
     from {{ ref('stg__developers') }}
 ),
 vacancy as (
-    select * from {{ ref('vacancy') }}
+    select * from {{ ref('stg__vacancy') }}
 ),
 merged as (
     select 
