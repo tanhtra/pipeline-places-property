@@ -1,5 +1,7 @@
 # Property Crawler Pipeline
 
+<br>
+
 ## Overview
 
 The PCP (Property Crawler Pipeline) is a combination concepts that forms an almost end to end data extraction pipeline.
@@ -18,9 +20,15 @@ The codebase have been split up into several components:
 - details-extractor, the main page crawler script that extracts data and acts as the primary producer for Confluent
 - streamlit - the data visualisation and simple exploration arm of the project
 
+<br>
+
 ## Reference Architecture
 
+<br>
+
 ![documentation/github/img/P03_Github.png](documentation/github/img/P03_Github.png)
+
+<br>
 
 The PCP currently employs various tools such as:
 
@@ -33,18 +41,24 @@ The PCP currently employs various tools such as:
 - AWS (S3) as the file / export repository
 - and Streamlit as dashboard
 
+<br>
+
 # Get started
 
 ## Code
 
-Clone the repository - ie
+Clone the repository
 
 ``` git clone https://github.com/tanhtra/pipeline-places-property.git ```
+
+<br>
 
 ## dbt
 
 - Sign up to [dbt cloud](https://www.getdbt.com/)
 - Initialise dbt cloud using the [dbt_project.yml](https://github.com/tanhtra/pipeline-places-property/blob/main/dbt_project.yml)
+
+<br>
 
 ## Confluent (Kafka)
 
@@ -54,33 +68,38 @@ Clone the repository - ie
     - ```index_meta```
     - ```property_details```
 - Generate an S3 sink to consume the two topics and drop the payload into S3 as JSON files
-- Create/modify two kafka.config files with your Confluent details and place them in [places/extractor/src](https://github.com/tanhtra/pipeline-places-property/tree/main/places-extractor/src) and [property-extractor/src](https://github.com/tanhtra/pipeline-places-property/tree/main/property-extractor/src)
+- Create/modify two ```kafka.config``` files with your Confluent details and place them in 
+    - ```places/extractor/src``` 
+    - ```property-extractor/src```
 
 ```
 # Required connection configs for Kafka producer, consumer, and admin
 
 # bootstrap server - do not include the protocol e.g. pkc-2396y.us-east-1.aws.confluent.cloud:8443
-bootstrap.servers=<FILL WITH CONFLUENT BOOTSTRAP SERVER>
+bootstrap.servers=<CONFLUENT BOOTSTRAP SERVER>
 
 security.protocol=SASL_SSL
 sasl.mechanisms=PLAIN
 
 # username for kafka
-sasl.username=<FILL WITH CONFLUENT USERNAME>
+sasl.username=<CONFLUENT USERNAME>
 
 # password for kafka
-sasl.password=<FILL WITH CONFLUENT PASSWORD>
+sasl.password=<CONFLUENT PASSWORD>
 compression.type=lz4
 batch.size=10000
 request.timeout.ms=120000
 queue.buffering.max.messages=200000
 ```
+<br>
 
 ## AWS S3
 
 - Sign up to [AWS](https://aws.amazon.com/) and create a bucket - using the same region as your Confluent cluster
 - Create an access key for the ```.env``` file
 - Create a new IAM user with S3 admin access to the bucket(s) involved
+
+<br>
 
 ## Airbyte
 
@@ -89,10 +108,14 @@ queue.buffering.max.messages=200000
 - Set up S3 source(s) for the Transit (CSV), Places (CSV), Index (JSON) and Property details (JSON) files 
 - Create Connection(s)
 
+<br>
+
 ## Foursquare
 
 - Sign up to [Foursquare developer programme](https://foursquare.com/developers/)
 - Generate API key for places extractor
+
+<br>
 
 ## Setup .env file
 
@@ -102,17 +125,19 @@ queue.buffering.max.messages=200000
 ```
 places_api_key=<FILL WITH PLACES API KEY>
 
-aws_access_key=<FILL WITH AWS S3 BUCKET ACCESS KEY>
-aws_secret_key=<FILL WITH AWS S3 BUCKET SECRET KEY>
+aws_access_key=<AWS S3 BUCKET ACCESS KEY>
+aws_secret_key=<AWS S3 BUCKET SECRET KEY>
 
 snowflake_host=<XXX>.snowflakecomputing.com
-snowflake_user=<FILL WITH USERNAME>
-snowflake_password=<FILL WITH USER PASSWORD>
+snowflake_user=<USERNAME>
+snowflake_password=<USER PASSWORD>
 snowflake_account=<XXX>
-snowflake_warehouse=<FILL WITH WAREHOUSE NAME>
-snowflake_database=<FILL WITH DATABASE NAME>
-snowflake_schema=<FILL WITH DATABASE SCHEMA>
+snowflake_warehouse=<WAREHOUSE NAME>
+snowflake_database=<DATABASE NAME>
+snowflake_schema=<DATABASE SCHEMA>
 ```
+
+<br>
 
 # Running the project
 
@@ -124,6 +149,8 @@ This section will read the Transit CSV data and generate API function calls and 
 - Run the ```set_python_path.sh```
 - Run ``` python places-extract.py ```
 
+<br>
+
 ## Running the Property-Extractor
 
 This section can crawl the targeted site to generate a list of properties then generate and upload the JSON payload.
@@ -132,6 +159,8 @@ This section can crawl the targeted site to generate a list of properties then g
 - Run the ```set_python_path.sh```
 - Run ``` python producer.py -f kafka.config -t index_meta ```
 - After the crawl is finished, go to Airbyte and trigger the ingestion of data to extract the generated JSON files from S3 to Snowflake
+
+<br>
 
 ## Running the Details-Extractor
 
@@ -142,13 +171,39 @@ This section can crawl the list of properties then generate and upload the JSON 
 - Run ``` python producer-details.py -f kafka.config -t property-details ```
 - After the crawl is finished, go to Airbyte and trigger the ingestion of data to extract the generated JSON files from S3 to Snowflake
 
+<br>
+
 ## Running dbt
 
 - Go to Airbyte cloud
 - Initialise the details required to connect to Snowflake and AWS S3
 - Run ```dbt build``` to generate the ```SERVING``` and ```STAGING``` tables from the ```RAW``` tables generated by the previous steps
 
-# Streamlit
+<br>
+
+## Running Streamlit
+
+- Go to ```streamlit/.streamlit``` folder
+- Create a ```secrets.toml``` file in the ```.streamlit``` folder
+- Fill the file with the values below
+
+````
+[snowflake]
+host = "<SNOWFLAKE HOST>"
+user = "<SNOWFLAKE USER>"
+password = "<SNOWFLAKE USER PASSWORD>"
+account = "<SNOWFLAKE ACCOUNT ID>"
+warehouse = "<WAREHOUSE NAME>"
+database = "<DATABASE NAME>"
+schema = "<SCHEMA NAME>"
+````
+
+- Go to ```streamlit/```
+- In terminal run ```streamlit run process.py``` to launch the raw-staging dashboard
+- In terminal run ```streamlit run serving.py``` to launch the serving dashboard
+
+<br>
 
 ### Primary contributor
+<hr>
 [tanhtra](https://github.com/tanhtra)
