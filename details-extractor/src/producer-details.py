@@ -19,11 +19,13 @@ limit = 100000
 
 def index_crawler(project_url):
 
+    # Initialising BS4 settings
     page = requests.get(project_url, headers={'User-Agent': 'Mozilla/5.0'})
 
     soup = BeautifulSoup(page.content, "html.parser")
     container_block = soup.find(class_="main-container")
 
+    # extract block 
     project_detail_name = container_block.find('h1', class_='page-title').text.strip()
 
     if container_block.find('ul', class_='features'):
@@ -62,6 +64,7 @@ def index_crawler(project_url):
     else:
         project_vacancy_rent = '0'
 
+    # casting the extracted data into a more workable format
     project_details = {
         "project_url" : project_url,
         "project_name" : project_detail_name,
@@ -80,6 +83,8 @@ def index_crawler(project_url):
     return jd
 
 def index_list():
+
+    # Connecting to Snowflake INDEX META table to get the list of target URLs
 
     host = os.environ.get("snowflake_host")
     user = os.environ.get("snowflake_user")
@@ -166,12 +171,13 @@ if __name__ == '__main__':
 
     # Details Page Crawler
     load_dotenv()
-    crawled_project_url = index_list()
-    extracted_project_url = details_list()
+
+    crawled_project_url = index_list()      # Get list of target URLs
+    extracted_project_url = details_list()  # Get list of completed crawls
 
     target_urls = [ i for i in crawled_project_url if i not in extracted_project_url ]
 
-    for i, project_url in enumerate(crawled_project_url):
+    for i, project_url in enumerate(target_urls):
         details = index_crawler(project_url)
 
         print(details)
