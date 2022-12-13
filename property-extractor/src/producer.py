@@ -21,18 +21,23 @@ limit = -1
 def index_crawler(URL):
     # Index Page Entry
 
+
+    # Setting up BeautifulSoup4 Variables
     page = requests.get(URL, headers={'User-Agent': 'Mozilla/5.0'})
 
     soup = BeautifulSoup(page.content, "html.parser")
     result_block = soup.find(id="search-results") ## Needs a Try block
 
+    # Checking if there are any crawlable objects
     if result_block.find_all('article','projects-list'):
         projects = result_block.find_all('article','projects-list')
     else:
         return
 
+    # Get a list of already-crawled index pages
     crawled_project_url = index_list()
-
+    
+    # Crawl through the pages
     for project in projects:
         project_name = project.find('h4', class_='project-name').text
         project_url = project.find('a')['href']
@@ -43,7 +48,8 @@ def index_crawler(URL):
         if project_url in crawled_project_url:
             print(f'Skipping {project_url} - already crawled')
             continue
-
+        
+        # Casting the extracted data into a workable format
         if None not in (project_name, project_url):
             project_index = {
                 'project_name' : project_name,
@@ -58,6 +64,8 @@ def index_crawler(URL):
 
 def index_list():
     load_dotenv()
+
+    # Get list of already crawled target URLs from Snowflake
 
     host = os.environ.get("snowflake_host")
     user = os.environ.get("snowflake_user")

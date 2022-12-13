@@ -205,5 +205,5 @@ schema = "<SCHEMA NAME>"
 <br>
 
 ### Primary contributor
-<hr>
+
 [tanhtra](https://github.com/tanhtra)
